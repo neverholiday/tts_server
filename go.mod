@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	cloud.google.com/go/texttospeech v1.10.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/sashabaranov/go-openai v1.36.0
 )

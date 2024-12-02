@@ -49,20 +49,25 @@ func (a *App) GoogleSynthesizeAudio(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-// func (a *App) OpenAISynthesizeAudio(c echo.Context) error {
+func (a *App) OpenAISynthesizeAudio(c echo.Context) error {
 
-// 	ctx := c.Request().Context()
+	ctx := c.Request().Context()
 
-// 	var req model.TTSReq
-// 	err := c.Bind(&req)
-// 	if err != nil {
-// 		return c.NoContent(http.StatusBadRequest)
-// 	}
+	var req model.TTSReq
+	err := c.Bind(&req)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
 
-// 	audio, err := a.ChatGPTTTSRepo.SynthesizeAudio(ctx, req.Text)
-// 	if err != nil {
-// 		return c.NoContent(http.StatusInternalServerError)
-// 	}
+	audio, err := a.ChatGPTTTSRepo.SynthesizeAudio(ctx, req.Text)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
 
-// 	return nil
-// }
+	resp := model.TTSResp{
+		Text:      audio.Text,
+		AudioData: audio.AudioData,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
