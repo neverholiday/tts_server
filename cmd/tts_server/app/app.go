@@ -1,39 +1,35 @@
 package app
 
 import (
-	"context"
 	"net/http"
 	"tts_server/cmd/tts_server/model"
+	"tts_server/cmd/tts_server/repositories"
 
 	"github.com/labstack/echo"
 )
 
-type ITextToSpeechRepo interface {
-	SynthesizeAudio(ctx context.Context, text string) (*model.TTSAudio, error)
-}
-
 type App struct {
-	GoogleTTSRepo  ITextToSpeechRepo
-	ChatGPTTTSRepo ITextToSpeechRepo
+	GoogleTTSRepo *repositories.GoogleTextToSpeechRepo
+	OpenAITTSRepo *repositories.OpenAITextToSpeechRepo
 }
 
-func NewApp(googleTTS ITextToSpeechRepo,
-	chatgptTTS ITextToSpeechRepo) *App {
+func NewApp(googleTTS *repositories.GoogleTextToSpeechRepo,
+	openAITTS *repositories.OpenAITextToSpeechRepo) *App {
 	return &App{GoogleTTSRepo: googleTTS,
-		ChatGPTTTSRepo: chatgptTTS}
+		OpenAITTSRepo: openAITTS}
 }
 
 func (a *App) GoogleSynthesizeAudio(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	var req model.TTSReq
+	var req model.GoogleTTSReq
 	err := c.Bind(&req)
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	audio, err := a.GoogleTTSRepo.SynthesizeAudio(ctx, req.Text)
+	audio, err := a.GoogleTTSRepo.SynthesizeAudio(ctx, req)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
@@ -53,13 +49,13 @@ func (a *App) OpenAISynthesizeAudio(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	var req model.TTSReq
+	var req model.OpenAITTSReq
 	err := c.Bind(&req)
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	audio, err := a.ChatGPTTTSRepo.SynthesizeAudio(ctx, req.Text)
+	audio, err := a.OpenAITTSRepo.SynthesizeAudio(ctx, req)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}

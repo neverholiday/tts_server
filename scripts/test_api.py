@@ -3,25 +3,49 @@
 import requests
 import base64
 import json
-
-url = "http://localhost:8080/synthesize/google"
-
-payload = {
-    # "text" : "จิตใจอ่อนแอเพียงใดเมื่อต้องการลืม บางทีคุณอาจไม่ลืม บางทีคุณอาจจะโกหก มันเป็นเรื่องโกหกที่คุณบอกทุกคนรอบตัวคุณ หรือบางทีอาจจะเป็นเรื่องโกหกที่คุณบอกตัวเอง - โยฮัน ลีเบิร์ต"
-    "text" : "ว่าจะใด๋"
-}
-
-resp = requests.post(url, json=payload)
-
-print( resp.status_code )
-
-respDict = json.loads(resp.content)
-audioDataStr = respDict['audio_data']
-
-# print(type(respDict['audio_data']))
-# audioDataByte = bytes(audioDataStr, 'utf-8')
-audioDataByte = base64.b64decode(respDict['audio_data'])
+import time
 
 
-with open("output_eiei.mp3", 'wb') as f:
-    f.write(audioDataByte)
+text = "ยายกินลำไย น้ำลายยายไหลย้อย"
+
+urlList = [
+    ("http://localhost:8080/synthesize/google", 
+     "google.mp3",
+     {
+         "text": text
+     }),
+    
+    ("http://localhost:8080/synthesize/openai", 
+     "openai.mp3",
+     {
+         "text": text,
+         "tts_model": "tts-1",
+         "speech_voice": "shimmer",
+     })
+]
+
+# // VoiceAlloy   SpeechVoice = "alloy"
+# // VoiceEcho    SpeechVoice = "echo"
+# // VoiceFable   SpeechVoice = "fable"
+# // VoiceOnyx    SpeechVoice = "onyx"
+# // VoiceNova    SpeechVoice = "nova"
+# // VoiceShimmer SpeechVoice = "shimmer"
+
+
+for url, fName, payload in urlList:
+    
+    startTime = time.time()
+    resp = requests.post(url, json=payload)
+    print( f'API time usage: {time.time()-startTime} second' )
+
+    if resp.status_code != 200:
+        print( f'return code not 200: actual: [{resp.status_code}] {resp.content!r}' )
+        continue
+
+    respDict = json.loads(resp.content)
+    audioDataStr = respDict['audio_data']
+    audioDataByte = base64.b64decode(respDict['audio_data'])
+
+    print(f'Write audio file: {fName}')
+    with open(fName, 'wb') as f:
+        f.write(audioDataByte)

@@ -17,14 +17,14 @@ func NewGoogleTextToSpeechRepo(client *texttospeech.Client) *GoogleTextToSpeechR
 	return &GoogleTextToSpeechRepo{Client: client}
 }
 
-func (r *GoogleTextToSpeechRepo) SynthesizeAudio(ctx context.Context, text string) (*model.TTSAudio, error) {
+func (r *GoogleTextToSpeechRepo) SynthesizeAudio(ctx context.Context, req model.GoogleTTSReq) (*model.TTSAudio, error) {
 
 	// Perform the text-to-speech request on the text input with the selected
 	// voice parameters and audio file type.
-	req := texttospeechpb.SynthesizeSpeechRequest{
+	speechReq := texttospeechpb.SynthesizeSpeechRequest{
 		// Set the text input to be synthesized.
 		Input: &texttospeechpb.SynthesisInput{
-			InputSource: &texttospeechpb.SynthesisInput_Text{Text: text},
+			InputSource: &texttospeechpb.SynthesisInput_Text{Text: req.Text},
 		},
 		// Build the voice request, select the language code ("en-US") and the SSML
 		Voice: &texttospeechpb.VoiceSelectionParams{
@@ -36,10 +36,10 @@ func (r *GoogleTextToSpeechRepo) SynthesizeAudio(ctx context.Context, text strin
 		},
 	}
 
-	resp, err := r.Client.SynthesizeSpeech(ctx, &req)
+	resp, err := r.Client.SynthesizeSpeech(ctx, &speechReq)
 	if err != nil {
 		return nil, fmt.Errorf("unable to synth: %v", err)
 	}
 
-	return &model.TTSAudio{Text: text, AudioData: resp.AudioContent}, nil
+	return &model.TTSAudio{Text: req.Text, AudioData: resp.AudioContent}, nil
 }
