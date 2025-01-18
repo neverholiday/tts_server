@@ -6,7 +6,7 @@ import json
 import time
 
 
-text = "ยายกินลำไย น้ำลายยายไหลย้อย"
+text = "สวัสดีค่ะ เราเคยรู้จักกันรึเปล่า"
 
 urlList = [
     ("http://localhost:8080/synthesize/google", 
@@ -14,14 +14,7 @@ urlList = [
      {
          "text": text
      }),
-    
-    ("http://localhost:8080/synthesize/openai", 
-     "openai.mp3",
-     {
-         "text": text,
-         "tts_model": "tts-1",
-         "speech_voice": "shimmer",
-     })
+
 ]
 
 # // VoiceAlloy   SpeechVoice = "alloy"

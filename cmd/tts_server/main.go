@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"tts_server/cmd/tts_server/app"
 	"tts_server/cmd/tts_server/model"
 	"tts_server/cmd/tts_server/repositories"
@@ -13,6 +14,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo"
 	"github.com/sashabaranov/go-openai"
+	"google.golang.org/api/option"
 )
 
 var (
@@ -31,8 +33,13 @@ func init() {
 		panic(err)
 	}
 
+	creds, err := base64.StdEncoding.DecodeString(envCfg.GoogleTTSCredentials)
+	if err != nil {
+		panic(err)
+	}
+
 	// google text to speech
-	gclient, err := texttospeech.NewClient(ctx)
+	gclient, err := texttospeech.NewClient(ctx, option.WithCredentialsJSON(creds))
 	if err != nil {
 		panic(err)
 	}
